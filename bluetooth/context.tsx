@@ -78,7 +78,7 @@ export const BluetoothProvider: React.FC = ({children}) => {
         serviceData: any;
       };
 
-      if (advertisingData.serviceData.fffa === undefined) {
+      if (typeof advertisingData.serviceData.fffa === 'undefined') {
         return;
       }
 
