@@ -40,7 +40,7 @@ const reducer = (state: BluetoothState, {type, payload}: ActionType) => {
   switch (type) {
     case 'AddDevice':
       console.log(
-        `[${format(new Date(), 'HH:MM:ss:SS')}] Added device with ID ${
+        `[${format(new Date(), 'HH:mm:ss:SS')}] Added device with ID ${
           payload.id
         }`,
       );
@@ -57,7 +57,7 @@ export const BluetoothProvider: React.FC = ({children}) => {
 
   const startScan = useCallback(() => {
     if (!isScanning) {
-      BleManager.scan([], 5, true, {scanMode: 2})
+      BleManager.scan([], 1, true, {scanMode: 2})
         .then(() => {
           console.log('Scanning...');
           setIsScanning(true);
@@ -89,14 +89,15 @@ export const BluetoothProvider: React.FC = ({children}) => {
   useEffect(() => {
     BleManager.start({showAlert: false});
 
-    const subscription = bleManagerEmitter.addListener(
+    bleManagerEmitter.addListener(
       'BleManagerDiscoverPeripheral',
       handleDiscoverPeripheral,
     );
 
     return () => {
-      bleManagerEmitter.removeSubscription(subscription);
+      bleManagerEmitter.removeAllListeners('BleManagerDiscoverPeripheral');
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -105,7 +106,7 @@ export const BluetoothProvider: React.FC = ({children}) => {
 
   useInterval(() => {
     startScan();
-  }, 30_000);
+  }, 10_000);
 
   return (
     <BluetoothContext.Provider value={{...state}}>
