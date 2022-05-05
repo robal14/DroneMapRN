@@ -9,13 +9,17 @@ import {
 } from 'react';
 import {DeviceInfo} from '../types/DeviceInfo';
 import {StatusEnum} from '../types/StatusEnum';
-import {requestPermissions} from './utils';
-import BleManager from 'react-native-ble-manager';
+import {mapToType, requestPermissions} from './utils';
+import BleManager, {AdvertisingData} from 'react-native-ble-manager';
 import {useInterval} from '../hooks/useInterval';
 import {NativeEventEmitter, NativeModules} from 'react-native';
 import {format} from 'date-fns';
+import {Buffer} from 'buffer';
 export const BleManagerModule = NativeModules.BleManager;
 export const bleManagerEmitter = new NativeEventEmitter(BleManagerModule);
+
+const OFFSET = 6;
+const MAX_MESSAGE_SIZE = 25;
 
 interface BluetoothState {
   devices: Record<string, DeviceInfo>;
@@ -57,19 +61,48 @@ export const BluetoothProvider: React.FC = ({children}) => {
 
   const startScan = useCallback(() => {
     if (!isScanning) {
-      BleManager.scan([], 1, true, {scanMode: 2})
+      BleManager.scan([], 3, true, {scanMode: 2})
         .then(() => {
           console.log('Scanning...');
           setIsScanning(true);
         })
         .catch(err => {
-          console.error(err);
+          console.log(err);
         });
     }
   }, [isScanning]);
 
   const handleDiscoverPeripheral = useCallback(
     (peripheral: BleManager.Peripheral) => {
+      const advertisingData = peripheral.advertising as AdvertisingData & {
+        serviceData: any;
+      };
+
+      if (advertisingData.serviceData.fffa === undefined) {
+        return;
+      }
+
+      const bytes: number[] = advertisingData.manufacturerData.bytes.map(
+        (byte: number) => byte.toString(16).toUpperCase(),
+      );
+
+      const buffer = Buffer.from(advertisingData.manufacturerData.bytes);
+
+      const typeId = (buffer.readIntLE(OFFSET, 1) & 0xff & 0xf0) >> 4;
+      const type = mapToType(typeId);
+
+      console.log(
+        `[add=${peripheral.id} rssi=${peripheral.rssi} len=${
+          bytes.length
+        }], ${type} ${bytes.join(' ')}`,
+      );
+
+      /**
+       * Get - 1 byte
+       * Short - 2 bytes
+       * Int - 4 bytes
+       * */
+
       dispatch({
         type: 'AddDevice',
         payload: {
