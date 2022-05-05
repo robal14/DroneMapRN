@@ -9,18 +9,11 @@
  */
 
 import React from 'react';
-import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  useColorScheme,
-  View,
-} from 'react-native';
+import {SafeAreaView, useColorScheme} from 'react-native';
 
 import {Colors} from 'react-native/Libraries/NewAppScreen';
 import {DeviceList} from './components/DeviceList';
-import {Provider} from 'react-redux';
-import {store} from './store';
+import {BluetoothProvider} from './bluetooth/context';
 
 const App = () => {
   const isDarkMode = useColorScheme() === 'dark';
@@ -30,21 +23,11 @@ const App = () => {
   };
 
   return (
-    <Provider store={store}>
+    <BluetoothProvider>
       <SafeAreaView style={backgroundStyle}>
-        <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-        <ScrollView
-          contentInsetAdjustmentBehavior="automatic"
-          style={backgroundStyle}>
-          <View
-            style={{
-              backgroundColor: isDarkMode ? Colors.black : Colors.white,
-            }}>
-            <DeviceList />
-          </View>
-        </ScrollView>
+        <DeviceList />
       </SafeAreaView>
-    </Provider>
+    </BluetoothProvider>
   );
 };
 

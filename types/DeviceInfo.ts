@@ -1,5 +1,5 @@
 export interface DeviceInfo {
-  id: number;
-  rssi: string;
+  id: string;
+  rssi: number;
   name: string;
 }
