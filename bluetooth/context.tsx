@@ -1,8 +1,7 @@
-import React, {useContext} from 'react';
-
-import {
+import React, {
   createContext,
   useCallback,
+  useContext,
   useEffect,
   useReducer,
   useState,
@@ -15,6 +14,8 @@ import {useInterval} from '../hooks/useInterval';
 import {NativeEventEmitter, NativeModules} from 'react-native';
 import {format} from 'date-fns';
 import {Buffer} from 'buffer';
+import {MessageType} from '../types/MessageType';
+
 export const BleManagerModule = NativeModules.BleManager;
 export const bleManagerEmitter = new NativeEventEmitter(BleManagerModule);
 
@@ -96,6 +97,32 @@ export const BluetoothProvider: React.FC = ({children}) => {
           bytes.length
         }], ${type} ${bytes.join(' ')}`,
       );
+
+      switch (type) {
+        case MessageType.BASIC_ID:
+          console.log('basic id dziala');
+          break;
+        case MessageType.LOCATION:
+          console.log('location dziala');
+          break;
+        case MessageType.AUTH:
+          console.log('auth dziala');
+          break;
+        case MessageType.SELF_ID:
+          console.log('selfid dziala');
+          break;
+        case MessageType.SYSTEM:
+          console.log('system dziala');
+          break;
+        case MessageType.OPERATOR_ID:
+          console.log('operator dziala');
+          break;
+        case MessageType.MESSAGE_PACK:
+          console.log('basic id dziala');
+          break;
+        default:
+          return;
+      }
 
       /**
        * Get - 1 byte
