@@ -19,7 +19,7 @@ import {MessageType} from '../types/MessageType';
 export const BleManagerModule = NativeModules.BleManager;
 export const bleManagerEmitter = new NativeEventEmitter(BleManagerModule);
 
-const OFFSET = 6;
+export const OFFSET = 6;
 const MAX_MESSAGE_SIZE = 25;
 
 interface BluetoothState {
