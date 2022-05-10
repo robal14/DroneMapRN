@@ -15,6 +15,9 @@ import {NativeEventEmitter, NativeModules} from 'react-native';
 import {format} from 'date-fns';
 import {Buffer} from 'buffer';
 import {MessageType} from '../types/MessageType';
+import buffer from 'buffer';
+import {Location} from './BtClass/Location';
+import {DroneData} from './BtClass/DroneData';
 
 export const BleManagerModule = NativeModules.BleManager;
 export const bleManagerEmitter = new NativeEventEmitter(BleManagerModule);
@@ -83,46 +86,10 @@ export const BluetoothProvider: React.FC = ({children}) => {
         return;
       }
 
-      const bytes: number[] = advertisingData.manufacturerData.bytes.map(
-        (byte: number) => byte.toString(16).toUpperCase(),
+      const droneData = new DroneData(
+        advertisingData.manufacturerData.bytes as number[],
       );
-
-      const buffer = Buffer.from(advertisingData.manufacturerData.bytes);
-
-      const typeId = (buffer.readIntLE(OFFSET, 1) & 0xff & 0xf0) >> 4;
-      const type = mapToType(typeId);
-
-      console.log(
-        `[add=${peripheral.id} rssi=${peripheral.rssi} len=${
-          bytes.length
-        }], ${type} ${bytes.join(' ')}`,
-      );
-
-      switch (type) {
-        case MessageType.BASIC_ID:
-          console.log('basic id dziala');
-          break;
-        case MessageType.LOCATION:
-          console.log('location dziala');
-          break;
-        case MessageType.AUTH:
-          console.log('auth dziala');
-          break;
-        case MessageType.SELF_ID:
-          console.log('selfid dziala');
-          break;
-        case MessageType.SYSTEM:
-          console.log('system dziala');
-          break;
-        case MessageType.OPERATOR_ID:
-          console.log('operator dziala');
-          break;
-        case MessageType.MESSAGE_PACK:
-          console.log('basic id dziala');
-          break;
-        default:
-          return;
-      }
+      console.log(droneData.getPayload());
 
       /**
        * Get - 1 byte
