@@ -16,7 +16,6 @@ import {format} from 'date-fns';
 import {Buffer} from 'buffer';
 import {MessageType} from '../types/MessageType';
 import buffer from 'buffer';
-import {Location} from './BtClass/Location';
 import {DroneData} from './BtClass/DroneData';
 
 export const BleManagerModule = NativeModules.BleManager;
