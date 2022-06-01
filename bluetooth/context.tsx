@@ -6,7 +6,7 @@ import React, {
   useReducer,
   useState,
 } from 'react';
-import {DeviceInfo} from '../types/DeviceInfo';
+import {DeviceInfo, isDeviceInfo} from '../types/DeviceInfo';
 import {StatusEnum} from '../types/StatusEnum';
 import {mapToType, requestPermissions} from './utils';
 import BleManager, {AdvertisingData} from 'react-native-ble-manager';
@@ -17,12 +17,18 @@ import {Buffer} from 'buffer';
 import {MessageType} from '../types/MessageType';
 import buffer from 'buffer';
 import {DroneData} from './BtClass/DroneData';
+import {isAuthData} from '../types/AuthData';
+import {isBasicId} from '../types/BasicId';
+import {isLocation} from '../types/Location';
+import {isSelfId} from '../types/SelfId';
+import {isOperatorId} from '../types/OperatorId';
+import {isSystemMsg} from '../types/SystemMsg';
 
 export const BleManagerModule = NativeModules.BleManager;
 export const bleManagerEmitter = new NativeEventEmitter(BleManagerModule);
 
 export const OFFSET = 6;
-const MAX_MESSAGE_SIZE = 25;
+export const MAX_MESSAGE_SIZE = 25;
 
 interface BluetoothState {
   devices: Record<string, DeviceInfo>;
@@ -88,7 +94,23 @@ export const BluetoothProvider: React.FC = ({children}) => {
       const droneData = new DroneData(
         advertisingData.manufacturerData.bytes as number[],
       );
-      console.log(droneData.getPayload());
+
+      const p = droneData.getPayload;
+
+      if (isAuthData(p)) {
+      }
+      if (isBasicId(p)) {
+      }
+      if (isLocation(p)) {
+      }
+      if (isSelfId(p)) {
+      }
+      if (isDeviceInfo(p)) {
+      }
+      if (isOperatorId(p)) {
+      }
+      if (isSystemMsg(p)) {
+      }
 
       /**
        * Get - 1 byte

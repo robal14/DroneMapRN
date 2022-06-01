@@ -18,13 +18,13 @@ export type PayloadType =
   | OperatorId;
 
 export class DroneData {
-  private payload?: PayloadType;
+  payload?: PayloadType;
   private buffer: Buffer;
-  MAX_AUTH_PAGE_ZERO_SIZE: number = 17;
-  MAX_AUTH_PAGE_NON_ZERO_SIZE: number = 23;
-  MAX_AUTH_DATA_PAGES: number = 16;
-  MAX_STRING_BYTE_SIZE: number = 23;
-  MAX_ID_BYTE_SIZE: number = 20;
+  static readonly MAX_AUTH_PAGE_ZERO_SIZE: number = 17;
+  static readonly MAX_AUTH_PAGE_NON_ZERO_SIZE: number = 23;
+  static readonly MAX_AUTH_DATA_PAGES: number = 16;
+  static readonly MAX_STRING_BYTE_SIZE: number = 23;
+  static readonly MAX_ID_BYTE_SIZE: number = 20;
 
   constructor(arg: number[]) {
     this.buffer = Buffer.from(arg);
@@ -65,8 +65,8 @@ export class DroneData {
     }
   }
 
-  public getPayload() {
-    return {...this.payload};
+  get getPayload() {
+    return this.payload;
   }
 
   private getLocationData() {
@@ -113,7 +113,11 @@ export class DroneData {
     basicId.idType = (type & 0xf0) >> 4;
     basicId.uaType = type & 0x0f;
     //byteBuffer.get(basicId.uasId, 0, Constants.MAX_ID_BYTE_SIZE);
-    basicId.uasId = this.buffer.readIntLE(OFFSET + 2, this.MAX_ID_BYTE_SIZE);
+    basicId.uasId = [];
+
+    for (let i = 0; i < 20; i++) {
+      basicId.uasId.push(this.buffer.readUIntLE(OFFSET + 2 + i, 1));
+    }
 
     return basicId as BasicId;
   }
@@ -125,7 +129,7 @@ export class DroneData {
     authentication.authDataPage = type & 0x0f;
 
     let offset = 0;
-    let amount = this.MAX_AUTH_PAGE_ZERO_SIZE;
+    let amount = DroneData.MAX_AUTH_PAGE_ZERO_SIZE;
 
     if (authentication.authDataPage == 0) {
       authentication.authLastPageIndex =
@@ -137,10 +141,11 @@ export class DroneData {
       // For an explanation, please see the description for struct ODID_Auth_data in:
       // https://github.com/opendroneid/opendroneid-core-c/blob/master/libopendroneid/opendroneid.h
       let len =
-        authentication.authLastPageIndex * this.MAX_AUTH_PAGE_NON_ZERO_SIZE +
-        this.MAX_AUTH_PAGE_ZERO_SIZE;
+        authentication.authLastPageIndex *
+          DroneData.MAX_AUTH_PAGE_NON_ZERO_SIZE +
+        DroneData.MAX_AUTH_PAGE_ZERO_SIZE;
       if (
-        authentication.authLastPageIndex >= this.MAX_AUTH_DATA_PAGES ||
+        authentication.authLastPageIndex >= DroneData.MAX_AUTH_DATA_PAGES ||
         authentication.authLength > len
       ) {
         authentication.authLastPageIndex = 0;
@@ -152,16 +157,21 @@ export class DroneData {
       }
     } else {
       offset =
-        this.MAX_AUTH_PAGE_ZERO_SIZE +
-        (authentication.authDataPage - 1) * this.MAX_AUTH_PAGE_NON_ZERO_SIZE;
-      amount = this.MAX_AUTH_PAGE_NON_ZERO_SIZE;
+        DroneData.MAX_AUTH_PAGE_ZERO_SIZE +
+        (authentication.authDataPage - 1) *
+          DroneData.MAX_AUTH_PAGE_NON_ZERO_SIZE;
+      amount = DroneData.MAX_AUTH_PAGE_NON_ZERO_SIZE;
     }
     if (
       authentication.authDataPage >= 0 &&
-      authentication.authDataPage < this.MAX_AUTH_DATA_PAGES
-    )
-      for (let i = offset; i < offset + amount; i++)
-        authentication.authData = this.buffer.readIntLE(OFFSET + offset, 1);
+      authentication.authDataPage < DroneData.MAX_AUTH_DATA_PAGES
+    ) {
+      authentication.authData = [];
+
+      for (let i = offset; i < offset + amount; i++) {
+        authentication.authData.push(this.buffer.readIntLE(OFFSET + i, 1));
+      }
+    }
     return authentication as AuthData;
   }
 
@@ -171,7 +181,7 @@ export class DroneData {
     selfId.descriptionType = this.buffer.readIntLE(OFFSET + 1, 1) & 0xff;
     selfId.operationDescription = this.buffer.readIntLE(
       OFFSET + 2,
-      this.MAX_STRING_BYTE_SIZE,
+      DroneData.MAX_STRING_BYTE_SIZE,
     );
 
     return selfId as SelfId;
@@ -203,7 +213,7 @@ export class DroneData {
     operatorId.operatorIdType = this.buffer.readIntLE(OFFSET + 1, 1) & 0xff;
     operatorId.operatorId = this.buffer.readIntLE(
       OFFSET + 1,
-      this.MAX_ID_BYTE_SIZE,
+      DroneData.MAX_ID_BYTE_SIZE,
     );
     return operatorId as OperatorId;
   }

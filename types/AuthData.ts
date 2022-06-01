@@ -4,5 +4,11 @@ export interface AuthData {
   authLastPageIndex: number;
   authLength: number;
   authTimestamp: number;
-  authData: number;
+  authData: number[];
 }
+
+export const isAuthData = (d: unknown): d is AuthData => {
+  const data = d as AuthData;
+
+  return data.authType !== undefined && data.authData !== undefined;
+};

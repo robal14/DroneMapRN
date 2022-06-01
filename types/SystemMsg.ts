@@ -12,3 +12,12 @@ export interface SystemMsg {
   operatorAltitudeGeo: number;
   systemTimestamp: number;
 }
+
+export const isSystemMsg = (d: unknown): d is SystemMsg => {
+  const data = d as SystemMsg;
+
+  return (
+    data.operatorLocationType !== undefined &&
+    data.classificationType !== undefined
+  );
+};
