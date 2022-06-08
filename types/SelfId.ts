@@ -1,6 +1,8 @@
 export interface SelfId {
   descriptionType: number;
-  operationDescription: number;
+  descriptionTypeString: string;
+  operationDescription: number[];
+  operationDescriptionString: string;
 }
 
 export const isSelfId = (d: unknown): d is SelfId => {

@@ -1,6 +1,8 @@
 export interface Location {
   status: number;
+  statusString: string;
   heightType: number;
+  heightTypeString: string;
   ewDirection: number;
   speedMult: number;
   direction: number;
@@ -12,10 +14,15 @@ export interface Location {
   altitudeGeodetic: number;
   height: number;
   horizontalAccuracy: number;
+  horizontalAccuracyString: string;
   verticalAccuracy: number;
+  verticalAccuracyString: string;
   baroAccuracy: number;
+  baroAccuracyString: string;
   speedAccuracy: number;
+  speedAccuracyString: string;
   timestamp: number;
+  timestampString: string;
   timeAccuracy: number;
   distance: number;
 }

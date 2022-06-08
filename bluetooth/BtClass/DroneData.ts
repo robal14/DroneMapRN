@@ -90,12 +90,12 @@ export class DroneData {
     location.horizontalAccuracy = horiVertAccuracy & 0x0f;
     location.verticalAccuracy = (horiVertAccuracy & 0xf0) >> 4;
 
-    const speedBaroAccuracy = this.buffer.readIntLE(OFFSET + 29, 1);
+    const speedBaroAccuracy = this.buffer.readIntLE(OFFSET + 20, 1);
 
     location.baroAccuracy = (speedBaroAccuracy & 0xf0) >> 4;
     location.speedAccuracy = speedBaroAccuracy & 0x0f;
-    location.timestamp = this.buffer.readIntLE(OFFSET + 30, 2) & 0xffff;
-    location.timeAccuracy = this.buffer.readIntLE(OFFSET + 32, 1) & 0x0f;
+    location.timestamp = this.buffer.readIntLE(OFFSET + 21, 2) & 0xffff;
+    location.timeAccuracy = this.buffer.readIntLE(OFFSET + 23, 1) & 0x0f;
     // Use an older retrieved receiver location to calculate the distance to the drone
     // if (droneLat != 0 && droneLon != 0) {
     //   android.Location droneLoc = new android.location.Location("");
@@ -169,7 +169,7 @@ export class DroneData {
       authentication.authData = [];
 
       for (let i = offset; i < offset + amount; i++) {
-        authentication.authData.push(this.buffer.readIntLE(OFFSET + i, 1));
+        authentication.authData.push(this.buffer.readIntLE(OFFSET + 1 + i, 1));
       }
     }
     return authentication as AuthData;
@@ -179,10 +179,16 @@ export class DroneData {
     const selfId: Partial<SelfId> = {};
 
     selfId.descriptionType = this.buffer.readIntLE(OFFSET + 1, 1) & 0xff;
-    selfId.operationDescription = this.buffer.readIntLE(
-      OFFSET + 2,
-      DroneData.MAX_STRING_BYTE_SIZE,
-    );
+    selfId.operationDescription = [];
+    let offset = OFFSET + 2;
+    let amount = DroneData.MAX_STRING_BYTE_SIZE;
+    for (let i = offset; i < offset + amount; i++) {
+      selfId.operationDescription.push(this.buffer.readIntLE(OFFSET + i, 1));
+    }
+    // selfId.operationDescription = this.buffer.readIntLE(
+    //   OFFSET + 2,
+    //   DroneData.MAX_STRING_BYTE_SIZE,
+    // );
 
     return selfId as SelfId;
   }
@@ -211,10 +217,16 @@ export class DroneData {
   private getOperatorId() {
     const operatorId: Partial<OperatorId> = {};
     operatorId.operatorIdType = this.buffer.readIntLE(OFFSET + 1, 1) & 0xff;
-    operatorId.operatorId = this.buffer.readIntLE(
-      OFFSET + 1,
-      DroneData.MAX_ID_BYTE_SIZE,
-    );
+    operatorId.operatorId = [];
+    let offset = OFFSET + 2;
+    let amount = DroneData.MAX_ID_BYTE_SIZE;
+    for (let i = offset; i < offset + amount; i++) {
+      operatorId.operatorId.push(this.buffer.readIntLE(OFFSET + i, 1));
+    }
+    // operatorId.operatorId = this.buffer.readIntLE(
+    //   OFFSET + 1,
+    //   DroneData.MAX_ID_BYTE_SIZE,
+    // );
     return operatorId as OperatorId;
   }
 }

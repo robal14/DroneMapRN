@@ -19,10 +19,20 @@ import buffer from 'buffer';
 import {DroneData} from './BtClass/DroneData';
 import {isAuthData} from '../types/AuthData';
 import {isBasicId} from '../types/BasicId';
-import {isLocation} from '../types/Location';
+import {isLocation, Location} from '../types/Location';
 import {isSelfId} from '../types/SelfId';
 import {isOperatorId} from '../types/OperatorId';
 import {isSystemMsg} from '../types/SystemMsg';
+import {FinalData} from '../types/FinalData';
+import {
+  readAuthData,
+  readBasicId,
+  readDeviceInfo,
+  readLocation,
+  readOperatorId,
+  readSelfId,
+  readSystemMsg,
+} from './BtClass/Translator';
 
 export const BleManagerModule = NativeModules.BleManager;
 export const bleManagerEmitter = new NativeEventEmitter(BleManagerModule);
@@ -96,20 +106,30 @@ export const BluetoothProvider: React.FC = ({children}) => {
       );
 
       const p = droneData.getPayload;
+      // const final: Partial<FinalData> = {};
 
       if (isAuthData(p)) {
+        readAuthData(p);
       }
       if (isBasicId(p)) {
+        // readBasicId(p);
       }
+
       if (isLocation(p)) {
+        // readLocation(p);
       }
+
       if (isSelfId(p)) {
+        // readSelfId(p);
       }
       if (isDeviceInfo(p)) {
+        // readDeviceInfo(p);
       }
       if (isOperatorId(p)) {
+        // readOperatorId(p);
       }
       if (isSystemMsg(p)) {
+        // readSystemMsg(p);
       }
 
       /**
