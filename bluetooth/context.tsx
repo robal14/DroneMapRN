@@ -112,24 +112,24 @@ export const BluetoothProvider: React.FC = ({children}) => {
         readAuthData(p);
       }
       if (isBasicId(p)) {
-        // readBasicId(p);
+        readBasicId(p);
       }
 
       if (isLocation(p)) {
-        // readLocation(p);
+        readLocation(p);
       }
 
       if (isSelfId(p)) {
-        // readSelfId(p);
+        readSelfId(p);
       }
       if (isDeviceInfo(p)) {
-        // readDeviceInfo(p);
+        readDeviceInfo(p);
       }
       if (isOperatorId(p)) {
-        // readOperatorId(p);
+        readOperatorId(p);
       }
       if (isSystemMsg(p)) {
-        // readSystemMsg(p);
+        readSystemMsg(p);
       }
 
       /**
