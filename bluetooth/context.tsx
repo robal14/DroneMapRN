@@ -8,18 +8,16 @@ import React, {
 } from 'react';
 import {DeviceInfo, isDeviceInfo} from '../types/DeviceInfo';
 import {StatusEnum} from '../types/StatusEnum';
-import {mapToType, requestPermissions} from './utils';
+import {noop, requestPermissions} from './utils';
 import BleManager, {AdvertisingData} from 'react-native-ble-manager';
 import {useInterval} from '../hooks/useInterval';
 import {NativeEventEmitter, NativeModules} from 'react-native';
 import {format} from 'date-fns';
-import {Buffer} from 'buffer';
-import {MessageType} from '../types/MessageType';
-import buffer from 'buffer';
+
 import {DroneData} from './BtClass/DroneData';
 import {isAuthData} from '../types/AuthData';
 import {isBasicId} from '../types/BasicId';
-import {isLocation, Location} from '../types/Location';
+import {isLocation} from '../types/Location';
 import {isSelfId} from '../types/SelfId';
 import {isOperatorId} from '../types/OperatorId';
 import {isSystemMsg} from '../types/SystemMsg';
@@ -43,18 +41,25 @@ export const MAX_MESSAGE_SIZE = 25;
 interface BluetoothState {
   devices: Record<string, DeviceInfo>;
   status: StatusEnum;
+  currentDevice: string | null;
+  selectDevice: (id: string | null) => void;
 }
 
 interface AddDeviceAction {
   type: 'AddDevice';
   payload: DeviceInfo;
 }
-
-type ActionType = AddDeviceAction;
+interface SelectDeviceAction {
+  type: 'SelectDeviceAction';
+  payload: string | null;
+}
+type ActionType = AddDeviceAction | SelectDeviceAction;
 
 export const initialState: BluetoothState = {
   devices: {},
   status: StatusEnum.INITIAL,
+  currentDevice: null,
+  selectDevice: noop,
 };
 
 const BluetoothContext = createContext<BluetoothState>(initialState);
@@ -68,7 +73,18 @@ const reducer = (state: BluetoothState, {type, payload}: ActionType) => {
         }`,
       );
 
-      return {...state, devices: {...state.devices, [payload.id]: payload}};
+      return {
+        ...state,
+        devices: {
+          ...state.devices,
+          [payload.id]: {
+            ...payload,
+            data: {...state.devices[payload.id]?.data, ...payload.data},
+          },
+        },
+      };
+    case 'SelectDeviceAction':
+      return {...state, currentDevice: payload};
     default:
       return state;
   }
@@ -106,30 +122,22 @@ export const BluetoothProvider: React.FC = ({children}) => {
       );
 
       const p = droneData.getPayload;
-      // const final: Partial<FinalData> = {};
+      let data: Partial<FinalData> = {};
 
       if (isAuthData(p)) {
-        readAuthData(p);
-      }
-      if (isBasicId(p)) {
-        readBasicId(p);
-      }
-
-      if (isLocation(p)) {
-        readLocation(p);
-      }
-
-      if (isSelfId(p)) {
-        readSelfId(p);
-      }
-      if (isDeviceInfo(p)) {
-        readDeviceInfo(p);
-      }
-      if (isOperatorId(p)) {
-        readOperatorId(p);
-      }
-      if (isSystemMsg(p)) {
-        readSystemMsg(p);
+        data = readAuthData(p);
+      } else if (isBasicId(p)) {
+        data = readBasicId(p);
+      } else if (isLocation(p)) {
+        data = readLocation(p);
+      } else if (isSelfId(p)) {
+        data = readSelfId(p);
+      } else if (isDeviceInfo(p)) {
+        data = readDeviceInfo(p);
+      } else if (isOperatorId(p)) {
+        data = readOperatorId(p);
+      } else if (isSystemMsg(p)) {
+        data = readSystemMsg(p);
       }
 
       /**
@@ -144,11 +152,15 @@ export const BluetoothProvider: React.FC = ({children}) => {
           id: peripheral.id,
           rssi: peripheral.rssi,
           name: peripheral.name ?? 'UNKNOWN',
+          data,
         },
       });
     },
     [],
   );
+  const selectDevice = useCallback((id: string | null) => {
+    dispatch({type: 'SelectDeviceAction', payload: id});
+  }, []);
 
   useEffect(() => {
     requestPermissions();
@@ -177,7 +189,7 @@ export const BluetoothProvider: React.FC = ({children}) => {
   }, 10_000);
 
   return (
-    <BluetoothContext.Provider value={{...state}}>
+    <BluetoothContext.Provider value={{...state, selectDevice}}>
       {children}
     </BluetoothContext.Provider>
   );

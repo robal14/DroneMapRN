@@ -1,10 +1,11 @@
-import React from 'react';
+import React, {useEffect, useMemo, useRef} from 'react';
 import MapView, {Marker} from 'react-native-maps';
-import {Dimensions, StyleSheet} from 'react-native';
-import RNLocation from 'react-native-location';
-import {FinalData} from '../../types/FinalData';
+import {Dimensions, StyleSheet, Image} from 'react-native';
+import {useBluetooth} from '../../bluetooth/context';
 const height = Dimensions.get('window').height;
-const final: Partial<FinalData> = {};
+import Geolocation from '@react-native-community/geolocation';
+
+import {useNavigate} from 'react-router-dom';
 
 const styles = StyleSheet.create({
   map: {
@@ -12,32 +13,64 @@ const styles = StyleSheet.create({
   },
 });
 
-let response = [
-  {
-    id: final.id,
-    coordinates: {
-      latitude: 53.483924741039594,
-      longitude: 14.5355242226861,
-    },
-  },
-];
-
 const Map = () => {
+  const mapRef = useRef<MapView>(null);
+  const {selectDevice} = useBluetooth();
+  const {devices} = useBluetooth();
+  const devicesLocations = useMemo(() => {
+    return Object.entries(devices).map(([key, value]) => ({
+      id: key,
+      coordinates: {
+        latitude: value.data.droneLat,
+        longitude: value.data.droneLon,
+      },
+      title: value.name,
+      description: value.id,
+      icon: require('./drone-icon.png'),
+    }));
+  }, [devices]);
+
+  // console.log(
+  //   'SELECTED DEVICE: ',
+  //   JSON.stringify(devices[currentDevice!], null, 2),
+  // );
+
+  useEffect(() => {
+    if (mapRef.current) {
+      Geolocation.getCurrentPosition(({coords}) => {
+        mapRef.current!.fitToCoordinates([coords], {
+          animated: true,
+        });
+      });
+    }
+  }, []);
+
   return (
     <MapView
+      ref={mapRef}
       style={styles.map}
-      loadingEnabled={true}
-      showsUserLocation={true}
-      // region={{
-      //   latitude: location.coords.latitude,
-      //   longitude: location.coords.longitude,
-      //   latitudeDelta: 0.015,
-      //   longitudeDelta: 0.0121,
-      // }}
-    >
-      {response.map(marker => (
-        <Marker key={marker.id} coordinate={marker.coordinates}></Marker>
-      ))}
+      loadingEnabled
+      followsUserLocation
+      showsUserLocation>
+      {devicesLocations.map(marker => {
+        if (!marker.coordinates.latitude || !marker.coordinates.longitude) {
+          return null;
+        }
+
+        return (
+          <Marker
+            key={marker.id}
+            title={marker.title}
+            description={marker.description}
+            onCalloutPress={() => selectDevice(marker.id)}
+            coordinate={{
+              latitude: marker.coordinates.latitude,
+              longitude: marker.coordinates.longitude,
+            }}>
+            <Image source={marker.icon} style={{height: 32, width: 32}} />
+          </Marker>
+        );
+      })}
     </MapView>
   );
 };

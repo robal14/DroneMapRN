@@ -1,19 +1,22 @@
 import {DeviceInfo} from '../../types/DeviceInfo';
-import {View, Text} from 'react-native';
+import {View, Text, TouchableOpacity} from 'react-native';
 import React from 'react';
+import {useBluetooth} from '../../bluetooth/context';
 
 interface Props {
   data: DeviceInfo;
 }
 
 export const Device: React.VFC<Props> = ({data}) => {
+  const {selectDevice} = useBluetooth();
+
   return (
-    <View>
+    <TouchableOpacity onPress={() => selectDevice(data.id)}>
       <Text
         style={{
           fontSize: 12,
           textAlign: 'center',
-          color: '#333333',
+          color: '#000',
           padding: 10,
         }}>
         {data.name}
@@ -22,7 +25,7 @@ export const Device: React.VFC<Props> = ({data}) => {
         style={{
           fontSize: 10,
           textAlign: 'center',
-          color: '#333333',
+          color: '#000',
           padding: 2,
         }}>
         RSSI: {data.rssi}
@@ -31,12 +34,12 @@ export const Device: React.VFC<Props> = ({data}) => {
         style={{
           fontSize: 8,
           textAlign: 'center',
-          color: '#333333',
+          color: '#000',
           padding: 2,
           paddingBottom: 20,
         }}>
         {data.id}
       </Text>
-    </View>
+    </TouchableOpacity>
   );
 };

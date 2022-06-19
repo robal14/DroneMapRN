@@ -1,5 +1,8 @@
 import {PermissionsAndroid, Platform} from 'react-native';
 import {MessageType} from '../types/MessageType';
+import Permissions from 'react-native-location/dist/lib/permissions';
+
+export const noop = () => {};
 
 export const requestPermissions = () => {
   if (Platform.OS === 'android' && Platform.Version >= 23) {

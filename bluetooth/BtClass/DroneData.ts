@@ -34,31 +34,24 @@ export class DroneData {
 
     switch (type) {
       case MessageType.BASIC_ID:
-        console.log('basic id:');
         this.payload = this.getBasicId();
         break;
       case MessageType.LOCATION:
-        console.log('location:');
         this.payload = this.getLocationData();
         break;
       case MessageType.AUTH:
-        console.log('auth:');
         this.payload = this.getAuthData();
         break;
       case MessageType.SELF_ID:
-        console.log('selfid:');
         this.payload = this.getSelfId();
         break;
       case MessageType.SYSTEM:
-        console.log('system:');
         this.payload = this.getSystemMsg();
         break;
       case MessageType.OPERATOR_ID:
-        console.log('operator:');
         this.payload = this.getOperatorId();
         break;
       case MessageType.MESSAGE_PACK:
-        console.log('to nie bedzie dzialac :C');
         break;
       default:
         return;
@@ -96,14 +89,6 @@ export class DroneData {
     location.speedAccuracy = speedBaroAccuracy & 0x0f;
     location.timestamp = this.buffer.readIntLE(OFFSET + 21, 2) & 0xffff;
     location.timeAccuracy = this.buffer.readIntLE(OFFSET + 23, 1) & 0x0f;
-    // Use an older retrieved receiver location to calculate the distance to the drone
-    // if (droneLat != 0 && droneLon != 0) {
-    //   android.Location droneLoc = new android.location.Location("");
-    //   droneLoc.setLatitude(location.getLatitude());
-    //   droneLoc.setLongitude(location.getLongitude());
-    //   if (receiverLocation != null)
-    //     distance = receiverLocation.distanceTo(droneLoc);
-    // }
     return location as Location;
   }
 
@@ -112,7 +97,6 @@ export class DroneData {
     const type = this.buffer.readIntLE(OFFSET + 1, 1);
     basicId.idType = (type & 0xf0) >> 4;
     basicId.uaType = type & 0x0f;
-    //byteBuffer.get(basicId.uasId, 0, Constants.MAX_ID_BYTE_SIZE);
     basicId.uasId = [];
 
     for (let i = 0; i < 20; i++) {

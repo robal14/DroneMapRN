@@ -82,7 +82,6 @@ export function readAuthData(p: AuthData) {
   }
   setAuthType();
   final.authTypeString = setAuthTypeAsString();
-  console.log('AuthTypeString:' + final.authTypeString);
   //AuthDataPage
   function setAuthDataPage() {
     if (p.authDataPage < 0) p.authDataPage = 0;
@@ -90,7 +89,6 @@ export function readAuthData(p: AuthData) {
     final.authDataPage = p.authDataPage;
   }
   setAuthDataPage();
-  console.log('AuthDataPage:' + final.authDataPage);
   //AuthLastPageIndex
   function setAuthLastPageIndex() {
     if (p.authLastPageIndex < 0) final.authLastPageIndex = 0;
@@ -98,7 +96,6 @@ export function readAuthData(p: AuthData) {
     final.authLastPageIndex = p.authLastPageIndex;
   }
   setAuthLastPageIndex();
-  console.log('AuthLastPageIndex:' + final.authLastPageIndex);
   //AuthLength
   function setAuthLength() {
     if (p.authLength < 0) final.authLength = 0;
@@ -106,7 +103,6 @@ export function readAuthData(p: AuthData) {
     final.authLength = p.authLength;
   }
   setAuthLength();
-  console.log('authLength:' + final.authLength);
   //AuthTimestamp
   function getAuthTimestamp() {
     if ((p.authTimestamp = 0)) final.authTimestampString = 'Unknown';
@@ -114,7 +110,6 @@ export function readAuthData(p: AuthData) {
     final.authTimestampString = '' + final.authTimestamp;
   }
   getAuthTimestamp();
-  console.log('AuthTimeStamp:' + final.authTimestampString);
   //AuthData
   function getAuthDataAsString() {
     final.authData = [];
@@ -124,8 +119,8 @@ export function readAuthData(p: AuthData) {
     }
   }
   getAuthDataAsString();
-  console.log('AuthData:' + final.authData);
-  console.log('AuthDataString:' + p.authDataString);
+
+  return final;
 }
 
 export function readBasicId(p: BasicId) {
@@ -177,7 +172,6 @@ export function readBasicId(p: BasicId) {
   }
 
   final.idTypeString = setIdTypeAsString();
-  console.log('IdTypeString:' + final.idTypeString);
 
   //UaType
   enum UaTypeEnum {
@@ -289,7 +283,6 @@ export function readBasicId(p: BasicId) {
     }
   }
   final.uaTypeString = setUaTypeAsString();
-  console.log('UaType:' + final.uaTypeString);
   function getUasId() {
     if (p.uasId.length <= 20) final.uasId = p.uasId;
   }
@@ -305,13 +298,13 @@ export function readBasicId(p: BasicId) {
   }
 
   getUasIdAsString();
-  console.log('UasId:' + final.uasId);
-  console.log('UasIdString:' + final.uasIdString);
+
+  return final;
 }
 
 export function readLocation(p: Location) {
   const final: Partial<FinalData> = {};
-
+  ``;
   //Status
   enum StatusEnum {
     Undeclared,
@@ -354,7 +347,6 @@ export function readLocation(p: Location) {
     }
   }
   final.statusString = getStatusAsString();
-  console.log('status:' + final.statusString);
   //HeightType
   enum heightTypeEnum {
     Takeoff,
@@ -375,7 +367,6 @@ export function readLocation(p: Location) {
     }
   }
   final.heightTypeString = setHeightTypeAsString();
-  console.log('HeightType:' + final.heightTypeString);
   // direction
   if (p.direction < 0 || p.direction > 360) p.direction = 361; // 361 is defined in the specification as the Invalid value
   function calcDirection(dir: number, ewDir: number) {
@@ -384,7 +375,6 @@ export function readLocation(p: Location) {
   }
 
   final.direction = calcDirection(p.direction, p.ewDirection);
-  console.log('dir:' + final.direction);
   // speedHorizontal
   if (p.speedHori < 0 || p.speedHori > 254.25) p.speedHori = 255;
 
@@ -394,11 +384,10 @@ export function readLocation(p: Location) {
   }
 
   final.speedHori = calcSpeedHori(p.speedHori, p.speedMult);
-  console.log('speedHori:' + final.speedHori);
   //speedVert
   if (p.speedVert < -62 || p.speedVert > 62) p.speedVert = 63;
   final.speedVert = p.speedVert * 0.5;
-  console.log('speedVert:' + final.speedVert);
+  if ((final.speedVert = 31.5)) final.speedVert = 0;
   //Lattitude
   final.droneLat = 1e-7 * p.droneLat;
 
@@ -406,7 +395,6 @@ export function readLocation(p: Location) {
     final.droneLat = 0;
     final.droneLon = 0; // both equal to zero is defined in the specification as the Invalid value
   }
-  console.log('droneLat:' + final.droneLat);
   //Longitude
   final.droneLon = 1e-7 * p.droneLon;
 
@@ -414,7 +402,6 @@ export function readLocation(p: Location) {
     final.droneLon = 0;
     final.droneLon = 0; // both equal to zero is defined in the specification as the Invalid value
   }
-  console.log('droneLon:' + final.droneLon);
 
   //Altitude Pressure
   if (p.altitudePressure < -1000 || p.altitudePressure > 31767)
@@ -427,10 +414,9 @@ export function readLocation(p: Location) {
 
   final.altitudePressure = calcAltitude(p.altitudePressure);
   if (final.altitudePressure === -1000) {
-    console.log('unknown');
+    final.altitudePressure = undefined;
   } //-1000 is defined as unknown in specification
   else {
-    console.log('altPress:' + final.altitudePressure);
   }
   //Altitude Geodetic
   if (p.altitudeGeodetic < -1000 || p.altitudeGeodetic > 31767) {
@@ -438,15 +424,13 @@ export function readLocation(p: Location) {
   }
   final.altitudeGeodetic = calcAltitude(p.altitudeGeodetic);
   if (final.altitudeGeodetic === -1000) {
-    console.log('unknown');
+    final.altitudeGeodetic = undefined;
   } //-1000 is defined as uknown in specification
   else {
-    console.log('altGeo:' + final.altitudeGeodetic);
   }
   //Height
   if (p.height < -1000 || p.height > 31767) final.height = -1000;
   else final.height = p.height;
-  console.log('height:' + final.height);
 
   //HorizontalAccuracy
   enum HorizontalAccuracyEnum {
@@ -538,7 +522,6 @@ export function readLocation(p: Location) {
   }
 
   final.horizontalAccuracyString = getHorizontalAccuracyAsString();
-  console.log('HorizontalAcc:' + final.horizontalAccuracyString);
 
   //VerticalAccuracy
   enum VerticalAccuracyEnum {
@@ -594,7 +577,6 @@ export function readLocation(p: Location) {
   }
 
   final.verticalAccuracyString = getVerticalAccuracyAsString();
-  console.log('VerticalAcc:' + final.verticalAccuracyString);
 
   //BaroAccuracy
   enum BaroAccuracyEnum {
@@ -650,7 +632,6 @@ export function readLocation(p: Location) {
   }
 
   final.baroAccuracyString = getBaroAccuracyAsString();
-  console.log('BaroAcc:' + final.baroAccuracyString);
 
   //SpeedAccuracy
   enum speedAccuracyEnum {
@@ -695,7 +676,6 @@ export function readLocation(p: Location) {
   }
 
   final.speedAccuracyString = getSpeedAccuracyAsString();
-  console.log('speedAccuracy:' + final.speedAccuracyString);
 
   //Timestamp
   final.timestamp = 0;
@@ -733,7 +713,6 @@ export function readLocation(p: Location) {
   }
 
   getLocationTimestampAsString();
-  console.log('locationTimestamp:' + final.timestampString);
 
   function setTimeAccuracy() {
     if (p.timeAccuracy < 0) final.timeAccuracy = 0;
@@ -741,7 +720,8 @@ export function readLocation(p: Location) {
     final.timeAccuracy = p.timeAccuracy;
   }
   setTimeAccuracy();
-  console.log('timeAccuracy:' + final.timeAccuracy);
+
+  return final;
 }
 
 export function readSelfId(p: SelfId) {
@@ -770,8 +750,6 @@ export function readSelfId(p: SelfId) {
   }
   final.descriptionTypeString = setDescriptionType();
 
-  console.log('DescriptionType:' + final.descriptionTypeString);
-
   function setOperationDescriptionAsString() {
     final.operationDescription = p.operationDescription;
     if (p.operationDescription != null) {
@@ -788,7 +766,7 @@ export function readSelfId(p: SelfId) {
     return;
   }
   setOperationDescriptionAsString();
-  console.log('OperationDescriptionString:' + final.operationDescriptionString);
+  return final;
 }
 
 export function readDeviceInfo(p: DeviceInfo) {
@@ -796,6 +774,7 @@ export function readDeviceInfo(p: DeviceInfo) {
   final.id = p.id;
   final.rssi = p.rssi;
   final.name = p.name;
+  return final;
 }
 
 export function readOperatorId(p: OperatorId) {
@@ -806,7 +785,6 @@ export function readOperatorId(p: OperatorId) {
     final.operatorIdType = p.operatorIdType;
   }
   setOperatorIdType();
-  console.log('OperatorIdType:' + final.operatorIdType);
   function setOperatorId() {
     if (p.operatorId.length <= DroneData.MAX_ID_BYTE_SIZE)
       final.operatorId = p.operatorId;
@@ -822,7 +800,7 @@ export function readOperatorId(p: OperatorId) {
     return;
   }
   getOperatorIdAsString();
-  console.log('OperatorIdString:' + final.operatorIdString);
+  return final;
 }
 
 export function readSystemMsg(p: SystemMsg) {
@@ -864,7 +842,6 @@ export function readSystemMsg(p: SystemMsg) {
     }
   }
   final.operatorLocationTypeString = setOperatorLocationTypeAsString();
-  console.log('OperatorLocationType:' + final.operatorLocationTypeString);
   //OperatorClassificationType
   enum classificationTypeEnum {
     Undeclared,
@@ -887,7 +864,6 @@ export function readSystemMsg(p: SystemMsg) {
     }
   }
   final.classificationTypeString = setClassificationTypeAsString();
-  console.log('ClassType:' + final.classificationTypeString);
   //OperatorLattitude
   final.operatorLatitude = 1e-7 * p.operatorLatitude;
 
@@ -895,7 +871,6 @@ export function readSystemMsg(p: SystemMsg) {
     final.operatorLatitude = 0;
     final.droneLon = 0; // both equal to zero is defined in the specification as the Invalid value
   }
-  console.log('operatorLatitude:' + final.operatorLatitude);
   //OperatorLongitude
   final.operatorLongitude = 1e-7 * p.operatorLongitude;
 
@@ -903,13 +878,10 @@ export function readSystemMsg(p: SystemMsg) {
     final.operatorLongitude = 0;
     final.operatorLatitude = 0; // both equal to zero is defined in the specification as the Invalid value
   }
-  console.log('operatorLongitude:' + final.operatorLongitude);
   //AreaCount
   final.areaCount = p.areaCount;
-  console.log('AreaCount:' + final.areaCount);
   //AreaRadius
   final.areaRadius = p.areaRadius * 10;
-  console.log('AreaRadius:' + final.areaRadius);
 
   function getAltitudeAsString(altitude: number) {
     if (altitude == -1000) return 'Unknown';
@@ -921,11 +893,9 @@ export function readSystemMsg(p: SystemMsg) {
   //AreaCeiling
   final.areaCeiling = calcAltitude(p.areaCeiling);
   final.areaCeilingString = getAltitudeAsString(final.areaCeiling);
-  console.log('AreaCeilingString:' + final.areaCeilingString);
   //AreaFloor
   final.areaFloor = calcAltitude(p.areaFloor);
   final.areaFloorString = getAltitudeAsString(final.areaFloor);
-  console.log('AreaFloorString:' + final.areaFloorString);
   //Category
   enum categoryEnum {
     Undeclared,
@@ -967,7 +937,6 @@ export function readSystemMsg(p: SystemMsg) {
     }
   }
   final.categoryString = setCategoryString();
-  console.log('Category:' + final.categoryString);
 
   enum classValueEnum {
     Undeclared,
@@ -1033,13 +1002,11 @@ export function readSystemMsg(p: SystemMsg) {
   }
   setClassValue();
   final.classValueString = setClassValueAsString();
-  console.log('classValueString:' + final.classValueString);
   //operatorAltitudeGeo
   final.operatorAltitudeGeo = calcAltitude(p.operatorAltitudeGeo);
   final.operatorAltitudeGeoString = getAltitudeAsString(
     final.operatorAltitudeGeo,
   );
-  console.log('OperatorAltitudeGeoString:' + final.operatorAltitudeGeoString);
   //SystemTimestamp
   final.systemTimestamp = 0;
 
@@ -1076,5 +1043,5 @@ export function readSystemMsg(p: SystemMsg) {
   }
 
   getSystemTimestampAsString();
-  console.log('SystemTimestamp:' + final.systemTimestampString);
+  return final;
 }

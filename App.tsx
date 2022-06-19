@@ -1,25 +1,51 @@
 import React from 'react';
-import {SafeAreaView, useColorScheme} from 'react-native';
-
-import {Colors} from 'react-native/Libraries/NewAppScreen';
-import {DeviceList} from './components/DeviceList';
+import {NavigationContainer} from '@react-navigation/native';
 import {BluetoothProvider} from './bluetooth/context';
+
 import MapView from './components/Screens/MapView';
+import {DeviceList} from './components/DeviceList';
 
-const App = () => {
-  const isDarkMode = useColorScheme() === 'dark';
+import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+import SafeAreaView, {SafeAreaProvider} from 'react-native-safe-area-view';
+import DeviceModal from './components/DeviceModal/DeviceModal';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import TabBarIcon from '@react-navigation/bottom-tabs/lib/typescript/src/views/TabBarIcon';
 
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
+const Tab = createBottomTabNavigator();
 
+export default () => {
   return (
     <BluetoothProvider>
-      <SafeAreaView style={backgroundStyle}>
-        <MapView />
-      </SafeAreaView>
+      <SafeAreaProvider>
+        <SafeAreaView style={{flex: 1}}>
+          <NavigationContainer>
+            <Tab.Navigator>
+              <Tab.Screen
+                name="Device Map"
+                component={MapView}
+                options={{
+                  tabBarLabel: 'Device Map',
+                  tabBarIcon: ({color, size}) => (
+                    <Ionicons name="map" color={color} size={size} />
+                  ),
+                }}
+              />
+              <Tab.Screen
+                name="Device List"
+                component={DeviceList}
+                options={{
+                  tabBarLabel: 'Device List',
+                  tabBarIcon: ({color, size}) => (
+                    <Ionicons name="list" color={color} size={size} />
+                  ),
+                }}
+              />
+            </Tab.Navigator>
+          </NavigationContainer>
+          <DeviceModal />
+        </SafeAreaView>
+      </SafeAreaProvider>
     </BluetoothProvider>
   );
 };
-
-export default App;
