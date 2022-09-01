@@ -4,10 +4,6 @@ export interface DeviceInfo {
   id: string;
   rssi: number;
   name: string;
+  updatedAt: Date;
   data: Partial<FinalData>;
 }
-export const isDeviceInfo = (d: unknown): d is DeviceInfo => {
-  const data = d as DeviceInfo;
-
-  return data.id !== undefined && data.name !== undefined;
-};

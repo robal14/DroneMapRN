@@ -84,21 +84,27 @@ const DeviceModal: React.FC = () => {
               {'\n'}Timestamp: {device.data.timestampString}
             </Text>
           </Text>
+          <Text style={styles.modalHeader}>System/Operator</Text>
+          <Text style={styles.modalText}>
+            LocationType:{device.data.operatorLocationTypeString}
+            {'\n'}Altitude:{device.data.operatorAltitudeGeoString}
+            {'\n'}Latitude:{device.data.operatorLatitude}
+            {'\n'}AreaCount:{device.data.areaCount}
+            {'\n'}AreaRadius:{device.data.areaRadius}
+            {'\n'}AreaCeiling:{device.data.areaCeilingString}
+            {'\n'}AreaFloor:{device.data.areaFloorString}
+            {'\n'}Category:{device.data.operatorLongitude}
+            {'\n'}ClassValue:{device.data.operatorLongitude}
+            {'\n'}SystemTimestamp:{device.data.operatorLongitude}
+            {'\n'}OperatorIdType:{device.data.operatorIdType}
+            {'\n'}OperatorId:{device.data.operatorIdString}
+          </Text>
           <Text style={styles.modalHeader}>
-            System/Operator{'\n'}
+            SelfId{'\n'}
             <Text style={styles.modalText}>
-              LocationType:{device.data.operatorLocationTypeString}
-              {'\n'}Altitude:{device.data.operatorAltitudeGeoString}
-              {'\n'}Latitude:{device.data.operatorLatitude}
-              {'\n'}Longitude:{device.data.operatorLongitude}
-              {'\n'}AreaCount:{device.data.areaCount}
-              {'\n'}AreaRadius:{device.data.areaRadius}
-              {'\n'}AreaCeiling:{device.data.areaCeiling}
-              {'\n'}AreaFloor:{device.data.areaFloor}
-              {'\n'}Classification:{device.data.classificationTypeString}
-              {'\n'}Timestamp:{device.data.systemTimestampString}
-              {'\n'}Category:{device.data.categoryString}
-              {'\n'}Class:{device.data.classValueString}
+              DescriptionType:{device.data.descriptionTypeString}
+              {'\n'}OperationDescription:
+              {device.data.operationDescriptionString}
             </Text>
           </Text>
         </ScrollView>

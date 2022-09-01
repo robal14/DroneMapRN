@@ -5,8 +5,6 @@ import {useBluetooth} from '../../bluetooth/context';
 const height = Dimensions.get('window').height;
 import Geolocation from '@react-native-community/geolocation';
 
-import {useNavigate} from 'react-router-dom';
-
 const styles = StyleSheet.create({
   map: {
     height,
@@ -29,11 +27,6 @@ const Map = () => {
       icon: require('./drone-icon.png'),
     }));
   }, [devices]);
-
-  // console.log(
-  //   'SELECTED DEVICE: ',
-  //   JSON.stringify(devices[currentDevice!], null, 2),
-  // );
 
   useEffect(() => {
     if (mapRef.current) {

@@ -38,6 +38,7 @@ export class DroneData {
         break;
       case MessageType.LOCATION:
         this.payload = this.getLocationData();
+        console.log(this.payload);
         break;
       case MessageType.AUTH:
         this.payload = this.getAuthData();

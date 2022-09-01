@@ -6,13 +6,13 @@ import React, {
   useReducer,
   useState,
 } from 'react';
-import {DeviceInfo, isDeviceInfo} from '../types/DeviceInfo';
+import {DeviceInfo} from '../types/DeviceInfo';
 import {StatusEnum} from '../types/StatusEnum';
 import {noop, requestPermissions} from './utils';
 import BleManager, {AdvertisingData} from 'react-native-ble-manager';
 import {useInterval} from '../hooks/useInterval';
 import {NativeEventEmitter, NativeModules} from 'react-native';
-import {format} from 'date-fns';
+import {differenceInMilliseconds, differenceInSeconds, format} from 'date-fns';
 
 import {DroneData} from './BtClass/DroneData';
 import {isAuthData} from '../types/AuthData';
@@ -53,7 +53,11 @@ interface SelectDeviceAction {
   type: 'SelectDeviceAction';
   payload: string | null;
 }
-type ActionType = AddDeviceAction | SelectDeviceAction;
+interface RemoveDeviceAction {
+  type: 'RemoveDevice';
+  payload: string;
+}
+type ActionType = AddDeviceAction | SelectDeviceAction | RemoveDeviceAction;
 
 export const initialState: BluetoothState = {
   devices: {},
@@ -85,6 +89,10 @@ const reducer = (state: BluetoothState, {type, payload}: ActionType) => {
       };
     case 'SelectDeviceAction':
       return {...state, currentDevice: payload};
+    case 'RemoveDevice':
+      const newState = {...state};
+      delete newState.devices[payload];
+      return newState;
     default:
       return state;
   }
@@ -107,6 +115,16 @@ export const BluetoothProvider: React.FC = ({children}) => {
     }
   }, [isScanning]);
 
+  const removeDevice = useCallback(() => {
+    const currentDate = new Date();
+
+    Object.entries(state.devices).forEach(([key, value]) => {
+      if (differenceInMilliseconds(currentDate, value.updatedAt) > 60_000) {
+        dispatch({type: 'RemoveDevice', payload: key});
+      }
+    });
+  }, [state.devices]);
+
   const handleDiscoverPeripheral = useCallback(
     (peripheral: BleManager.Peripheral) => {
       const advertisingData = peripheral.advertising as AdvertisingData & {
@@ -116,7 +134,7 @@ export const BluetoothProvider: React.FC = ({children}) => {
       if (typeof advertisingData.serviceData.fffa === 'undefined') {
         return;
       }
-
+      console.log(advertisingData.manufacturerData.bytes as number);
       const droneData = new DroneData(
         advertisingData.manufacturerData.bytes as number[],
       );
@@ -130,10 +148,9 @@ export const BluetoothProvider: React.FC = ({children}) => {
         data = readBasicId(p);
       } else if (isLocation(p)) {
         data = readLocation(p);
+        console.log(data);
       } else if (isSelfId(p)) {
         data = readSelfId(p);
-      } else if (isDeviceInfo(p)) {
-        data = readDeviceInfo(p);
       } else if (isOperatorId(p)) {
         data = readOperatorId(p);
       } else if (isSystemMsg(p)) {
@@ -152,6 +169,7 @@ export const BluetoothProvider: React.FC = ({children}) => {
           id: peripheral.id,
           rssi: peripheral.rssi,
           name: peripheral.name ?? 'UNKNOWN',
+          updatedAt: new Date(),
           data,
         },
       });
@@ -160,8 +178,7 @@ export const BluetoothProvider: React.FC = ({children}) => {
   );
   const selectDevice = useCallback((id: string | null) => {
     dispatch({type: 'SelectDeviceAction', payload: id});
-  }, []);
-
+  }, []);--
   useEffect(() => {
     requestPermissions();
   }, []);
@@ -187,6 +204,14 @@ export const BluetoothProvider: React.FC = ({children}) => {
   useInterval(() => {
     startScan();
   }, 10_000);
+
+  useInterval(
+    () => {
+      removeDevice();
+    },
+    10_000,
+    [removeDevice],
+  );
 
   return (
     <BluetoothContext.Provider value={{...state, selectDevice}}>

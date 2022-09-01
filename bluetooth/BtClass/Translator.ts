@@ -304,7 +304,6 @@ export function readBasicId(p: BasicId) {
 
 export function readLocation(p: Location) {
   const final: Partial<FinalData> = {};
-  ``;
   //Status
   enum StatusEnum {
     Undeclared,
@@ -317,36 +316,41 @@ export function readLocation(p: Location) {
   switch (p.status) {
     case 1:
       final.status = StatusEnum.Ground;
+      final.statusString = 'Ground';
       break;
     case 2:
       final.status = StatusEnum.Airborne;
+      final.statusString = 'Airborne';
       break;
     case 3:
       final.status = StatusEnum.Emergency;
+      final.statusString = 'Emergency';
       break;
     case 4:
       final.status = StatusEnum.Remote_ID_System_Failure;
+      final.statusString = 'Remote_ID_System_Failure';
       break;
     default:
       final.status = StatusEnum.Undeclared;
+      final.statusString = 'Undeclared';
       break;
   }
 
-  function getStatusAsString() {
-    switch (final.status) {
-      case StatusEnum.Ground:
-        return 'Ground';
-      case StatusEnum.Airborne:
-        return 'Airborne';
-      case StatusEnum.Emergency:
-        return 'Emergency';
-      case StatusEnum.Remote_ID_System_Failure:
-        return 'Remote_ID_System_Failure';
-      default:
-        return 'Undeclared';
-    }
-  }
-  final.statusString = getStatusAsString();
+  // function getStatusAsString() {
+  //   switch (final.status) {
+  //     case StatusEnum.Ground:
+  //       return 'Ground';
+  //     case StatusEnum.Airborne:
+  //       return 'Airborne';
+  //     case StatusEnum.Emergency:
+  //       return 'Emergency';
+  //     case StatusEnum.Remote_ID_System_Failure:
+  //       return 'Remote_ID_System_Failure';
+  //     default:
+  //       return 'Undeclared';
+  //   }
+  // }
+  // final.statusString = getStatusAsString();
   //HeightType
   enum heightTypeEnum {
     Takeoff,
@@ -393,14 +397,14 @@ export function readLocation(p: Location) {
 
   if (final.droneLat < -90 || final.droneLat > 90) {
     final.droneLat = 0;
-    final.droneLon = 0; // both equal to zero is defined in the specification as the Invalid value
+    final.droneLon = 0; // Ivalid value based on specification
   }
   //Longitude
   final.droneLon = 1e-7 * p.droneLon;
 
   if (final.droneLon < -180 || final.droneLon > 180) {
     final.droneLon = 0;
-    final.droneLon = 0; // both equal to zero is defined in the specification as the Invalid value
+    final.droneLon = 0; // Invalid value based on specification
   }
 
   //Altitude Pressure
@@ -452,76 +456,57 @@ export function readLocation(p: Location) {
   switch (p.horizontalAccuracy) {
     case 1:
       final.horizontalAccuracy = HorizontalAccuracyEnum.kilometers_18_52;
+      final.horizontalAccuracyString = '< 18.52 km';
+      break;
     case 2:
       final.horizontalAccuracy = HorizontalAccuracyEnum.kilometers_7_408;
+      final.horizontalAccuracyString = '< 7.408 km';
       break;
     case 3:
       final.horizontalAccuracy = HorizontalAccuracyEnum.kilometers_3_704;
+      final.horizontalAccuracyString = '< 3.704 km';
       break;
     case 4:
       final.horizontalAccuracy = HorizontalAccuracyEnum.kilometers_1_852;
+      final.horizontalAccuracyString = '< 1.852 km';
       break;
     case 5:
       final.horizontalAccuracy = HorizontalAccuracyEnum.meters_926;
+      final.horizontalAccuracyString = '< 926 m';
       break;
     case 6:
       final.horizontalAccuracy = HorizontalAccuracyEnum.meters_555_6;
+      final.horizontalAccuracyString = '< 555.6 m';
       break;
     case 7:
       final.horizontalAccuracy = HorizontalAccuracyEnum.meters_185_2;
+      final.horizontalAccuracyString = '< 185.2 m';
       break;
     case 8:
       final.horizontalAccuracy = HorizontalAccuracyEnum.meters_92_6;
+      final.horizontalAccuracyString = '< 92.6 m';
       break;
     case 9:
       final.horizontalAccuracy = HorizontalAccuracyEnum.meters_30;
+      final.horizontalAccuracyString = '< 30 m';
       break;
     case 10:
       final.horizontalAccuracy = HorizontalAccuracyEnum.meters_10;
+      final.horizontalAccuracyString = '< 10 m';
       break;
     case 11:
       final.horizontalAccuracy = HorizontalAccuracyEnum.meters_3;
+      final.horizontalAccuracyString = '< 3 m';
       break;
     case 12:
       final.horizontalAccuracy = HorizontalAccuracyEnum.meters_1;
+      final.horizontalAccuracyString = '< 1 m';
       break;
     default:
       final.horizontalAccuracy = HorizontalAccuracyEnum.Unknown;
+      final.horizontalAccuracyString = 'Unknown';
       break;
   }
-
-  function getHorizontalAccuracyAsString() {
-    switch (final.horizontalAccuracy) {
-      case HorizontalAccuracyEnum.kilometers_18_52:
-        return '< 18.52 km';
-      case HorizontalAccuracyEnum.kilometers_7_408:
-        return '< 7.408 km';
-      case HorizontalAccuracyEnum.kilometers_3_704:
-        return '< 3.704 km';
-      case HorizontalAccuracyEnum.kilometers_1_852:
-        return '< 1.852 km';
-      case HorizontalAccuracyEnum.meters_926:
-        return '< 926 m';
-      case HorizontalAccuracyEnum.meters_555_6:
-        return '< 555.6 m';
-      case HorizontalAccuracyEnum.meters_185_2:
-        return '< 185.2 m';
-      case HorizontalAccuracyEnum.meters_92_6:
-        return '< 92.6 m';
-      case HorizontalAccuracyEnum.meters_30:
-        return '< 30 m';
-      case HorizontalAccuracyEnum.meters_10:
-        return '< 10 m';
-      case HorizontalAccuracyEnum.meters_3:
-        return '< 3 m';
-      case HorizontalAccuracyEnum.meters_1:
-        return '< 1 m';
-      default:
-        return 'Unknown';
-    }
-  }
-
-  final.horizontalAccuracyString = getHorizontalAccuracyAsString();
 
   //VerticalAccuracy
   enum VerticalAccuracyEnum {
@@ -732,23 +717,25 @@ export function readSelfId(p: SelfId) {
     Extended_Status,
     Invalid,
   }
-  function setDescriptionType() {
-    switch (p.descriptionType) {
-      case 0:
-        final.descriptionType = descriptionTypeEnum.Text;
-        return 'Text';
-      case 1:
-        final.descriptionType = descriptionTypeEnum.Emergency;
-        return 'Emergency';
-      case 2:
-        final.descriptionType = descriptionTypeEnum.Extended_Status;
-        return 'ExtendedStatus';
-      default:
-        final.descriptionType = descriptionTypeEnum.Invalid;
-        return 'Invalid';
-    }
+
+  switch (p.descriptionType) {
+    case 0:
+      final.descriptionType = descriptionTypeEnum.Text;
+      final.descriptionTypeString = 'Invalid';
+      break;
+    case 1:
+      final.descriptionType = descriptionTypeEnum.Emergency;
+      final.descriptionTypeString = 'Invalid';
+      break;
+    case 2:
+      final.descriptionType = descriptionTypeEnum.Extended_Status;
+      final.descriptionTypeString = 'Invalid';
+      break;
+    default:
+      final.descriptionType = descriptionTypeEnum.Invalid;
+      final.descriptionTypeString = 'Invalid';
+      break;
   }
-  final.descriptionTypeString = setDescriptionType();
 
   function setOperationDescriptionAsString() {
     final.operationDescription = p.operationDescription;
@@ -765,15 +752,7 @@ export function readSelfId(p: SelfId) {
     }
     return;
   }
-  setOperationDescriptionAsString();
-  return final;
-}
-
-export function readDeviceInfo(p: DeviceInfo) {
-  const final: Partial<FinalData> = {};
-  final.id = p.id;
-  final.rssi = p.rssi;
-  final.name = p.name;
+  final.descriptionTypeString = setOperationDescriptionAsString();
   return final;
 }
 

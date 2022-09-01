@@ -30,5 +30,5 @@ export interface Location {
 export const isLocation = (d: unknown): d is Location => {
   const data = d as Location;
 
-  return data.status !== undefined && data.droneLat !== undefined;
+  return data.droneLon !== undefined && data.droneLat !== undefined;
 };

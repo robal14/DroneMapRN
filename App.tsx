@@ -9,8 +9,6 @@ import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import SafeAreaView, {SafeAreaProvider} from 'react-native-safe-area-view';
 import DeviceModal from './components/DeviceModal/DeviceModal';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import TabBarIcon from '@react-navigation/bottom-tabs/lib/typescript/src/views/TabBarIcon';
 
 const Tab = createBottomTabNavigator();
 

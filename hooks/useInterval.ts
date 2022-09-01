@@ -1,8 +1,10 @@
 import {useRef, useEffect} from 'react';
 
-export function useInterval(callback: () => void, delay: number | null) {
-  const savedCallback = useRef(callback);
-
+export function useInterval(
+  callback: () => void,
+  delay: number | null,
+  deps: unknown[] = [],
+) {
   // Set up the interval.
   useEffect(() => {
     // Don't schedule if no delay is specified.
@@ -11,8 +13,9 @@ export function useInterval(callback: () => void, delay: number | null) {
       return;
     }
 
-    const id = setInterval(() => savedCallback.current(), delay);
+    const id = setInterval(() => callback(), delay);
 
     return () => clearInterval(id);
-  }, [delay]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [delay, ...deps]);
 }
